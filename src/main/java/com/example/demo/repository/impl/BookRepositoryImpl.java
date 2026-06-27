@@ -4,6 +4,7 @@ import com.example.demo.exception.DataProcessingException;
 import com.example.demo.model.Book;
 import com.example.demo.repository.BookRepository;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -12,13 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@RequiredArgsConstructor
 public class BookRepositoryImpl implements BookRepository {
-    private final SessionFactory sessionFactory;
-
     @Autowired
-    public BookRepositoryImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+    private SessionFactory sessionFactory;
 
     @Override
     public Book save(Book book) {
@@ -49,6 +47,8 @@ public class BookRepositoryImpl implements BookRepository {
                     "FROM Book", Book.class
             );
             return findAllBooksQuery.getResultList();
+        } catch (Exception e) {
+            throw new DataProcessingException("Can't find all books", e);
         }
     }
 }
