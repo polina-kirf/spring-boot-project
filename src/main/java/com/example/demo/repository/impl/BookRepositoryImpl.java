@@ -4,6 +4,7 @@ import com.example.demo.exception.DataProcessingException;
 import com.example.demo.model.Book;
 import com.example.demo.repository.BookRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,6 +36,19 @@ public class BookRepositoryImpl implements BookRepository {
             if (session != null) {
                 session.close();
             }
+        }
+    }
+
+    @Override
+    public Optional<Book> findById(Long id) {
+        try (Session session = sessionFactory.openSession()) {
+            Query<Book> findBookByIdQuery = session.createQuery(
+                    "FROM Book WHERE id = :id", Book.class
+            );
+            findBookByIdQuery.setParameter("id", id);
+            return findBookByIdQuery.uniqueResultOptional();
+        } catch (Exception e) {
+            throw new DataProcessingException("Book with id: " + id + " not found", e);
         }
     }
 
